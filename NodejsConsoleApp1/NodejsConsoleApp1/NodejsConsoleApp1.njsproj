@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>16d84179-8894-482d-ab63-1402b7994c48</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Grammar.ts</StartupFile>
+    <StartupFile>testharness.ts</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>

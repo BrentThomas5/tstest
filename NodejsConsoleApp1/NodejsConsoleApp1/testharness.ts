@@ -34,6 +34,7 @@ function main(){
         }
     }
     console.log("All tests OK");
+    
     return true;
 }
  
