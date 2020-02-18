@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>16d84179-8894-482d-ab63-1402b7994c48</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Tokenizer.ts</StartupFile>
+    <StartupFile>testharness.ts</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -32,10 +32,18 @@
     <None Include="Tokenizer.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="tests.txt" />
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Grammar.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Terminal.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="testharness.ts" />
+    <TypeScriptCompile Include="Token.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
   </ItemGroup>
