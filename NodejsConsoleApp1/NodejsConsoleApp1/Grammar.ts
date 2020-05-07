@@ -3,26 +3,26 @@ import { error } from "util";
 export class Grammar {
     terminals: [string, RegExp][] = [];
     nonTerminals: [string, string][] = [];
+    nullable: Set<string> = new Set();
     constructor(Gram: string) {
         let s: Set<string> = new Set();
-        var input = Gram.split("\n\n");
-        let terms = input[0].split("\n");
-        let nonTerms = input[1].split("\n");
-        //this.terminals=[
-        //    new Terminal ("WHITESPACE", new RegExp("\s+")),
-        //    new Terminal ("COMMENT", new RegExp("/\*(.|\n)*?\*/")),
-        //    new Terminal("STRING", new RegExp('"(\\" | [^ "]) * "')),
-        //    new Terminal("NUM", new RegExp("-?\d+")),
-        //    new Terminal( "ASSIGNOP", new RegExp("=(?!=)")),
-        //    new Terminal( "EQUALITY" , new RegExp("==")),
-        //    new Terminal( "BOOLNOT" , new RegExp("!(?!=)")),
-        //    new Terminal( "NOTEQUAL", new RegExp("!=")),
-        //    new Terminal( "POWOP" ,new RegExp("[*](?![*])")),
-        //    new Terminal( "IF" ,new RegExp("\bif\b")),
-        //    new Terminal( "ELSE" , new RegExp("\belese\b")),
-        //    new Terminal( "ID" , new RegExp("[A-Za-z_]\w*"))
-        //];
-
+        var input = Gram.split("\n");
+        let terms: string [] = [];
+        let nonTerms: string[] = [];
+        let isTerm: boolean = true;
+        input.forEach(e => {
+            if (e.length != 0) {
+                if (isTerm) {
+                    terms.push(e);
+                }
+                else {
+                    nonTerms.push(e);
+                }
+            }
+            else {
+                isTerm = false;
+            }
+        })
         for (var i = 0; i < terms.length; i++) {
             if (terms[i].length == 0) {
                 continue;
@@ -68,6 +68,8 @@ export class Grammar {
                 throw new Error("Empty ID");
             else if (ID[1]=="")
                 throw new Error("Empty nonterminal");
+
+            //console.log(this.nonTerminals);
             const found: number = this.nonTerminals.findIndex(e => e[0] === ID[0])
             if (found !== -1) {
                 var nonterm = this.nonTerminals[found];
@@ -77,7 +79,7 @@ export class Grammar {
 
             else if (!s.has(ID[0]))
                 s.add(ID[0]);
-            console.log(s);
+            //console.log(s);
             this.nonTerminals[i] = [ID[0], ID[1]];
         }
         
@@ -86,19 +88,48 @@ export class Grammar {
         this.dfs(start, used);
         if (s !== undefined) {
             s.forEach(def => {
-                if (!used.has(def))
-                    throw new Error(def + " was defined but is not used");
+                if (!used.has(def)) {}
+                    //throw new Error(def + " was defined but is not used");
 
             });
         }
         if (used != undefined) {
             used.forEach(v => {
-                if (v !== '' && !s.has(v))
-                    throw new Error(v + " is used but is not defined");
+                if (v !== '' && !s.has(v)) {}
+                    //throw new Error(v + " is used but is not defined");
             })
         }
         
         //let bar: Set<string> = new Set();
+    }
+    
+    getNullable() {
+        this.nullable = new Set();
+        let bool;
+        console.log(this.nonTerminals);
+        while (true) {
+            bool = true;
+            this.nonTerminals.forEach(e => {
+                //console.log(e);
+                if (!this.nullable.has(e[0])) {
+                    let productions = e[1].split("|");
+                    //console.log(productions);
+                    productions.forEach(p => {
+                        let pro = p.trim().split(" ");
+
+                        if (pro.every(s => this.nullable.has(s) || s == "lambda")) {
+                            this.nullable.add(e[0]);
+                            bool = false;
+                        }
+
+                    })
+                }
+            });
+            if (bool)
+                break;
+        }
+        //console.log(this.nullable);
+        return this.nullable;
     }
     dfs(node: NodeType, used: Set<string>) {
     used.add(node.label);
