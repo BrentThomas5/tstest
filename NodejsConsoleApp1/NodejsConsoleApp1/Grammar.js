@@ -1,10 +1,10 @@
-﻿
-export class Grammar {
-    terminals: [string, RegExp][] = [];
-    constructor(Gram: string) {
-        let s: Set<string> = new Set();
+"use strict";
+exports.__esModule = true;
+var Grammar = /** @class */ (function () {
+    function Grammar(Gram) {
+        this.terminals = [];
+        var s = new Set();
         var input = Gram.split("\n");
-
         for (var i = 0; i < input.length; i++) {
             if (input[i].length == 0) {
                 continue;
@@ -23,18 +23,15 @@ export class Grammar {
             else if (ID[1] == "")
                 throw new Error("Empty Regex");
             try {
-                new RegExp(ID[1])
+                new RegExp(ID[1]);
             }
-            catch {
-                throw new Error("Invalid regular expression")
+            catch (_a) {
+                throw new Error("Invalid regular expression");
             }
             s.add(ID[0]);
             this.terminals[i] = [ID[0], RegExp(ID[1])];
         }
     }
-
-}
-
-
-
-
+    return Grammar;
+}());
+exports.Grammar = Grammar;
