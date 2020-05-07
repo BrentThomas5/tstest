@@ -30,10 +30,46 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.ts" />
+    <Content Include="gram.interp" />
+    <Content Include="gram.tokens" />
+    <Content Include="gram.txt" />
+    <Content Include="gramLexer.interp" />
+    <Content Include="gramLexer.js" />
+    <Content Include="gramLexer.tokens" />
+    <Content Include="gramListener.js" />
+    <Content Include="Grammar.js" />
+    <Content Include="Grammar.js.map" />
+    <Content Include="gramParser.js" />
+    <Content Include="input1.txt" />
+    <Content Include="input2.txt" />
+    <Content Include="input3.txt" />
+    <Content Include="Node.js" />
+    <Content Include="Node.js.map" />
     <Content Include="package.json" />
+    <Content Include="Parser.js" />
+    <Content Include="Parser.js.map" />
     <Content Include="README.md" />
+    <Content Include="runantlr.bat" />
+    <Content Include="testharness.js" />
+    <Content Include="testharness.js.map" />
+    <Content Include="Token.js" />
+    <Content Include="Token.js.map" />
+    <Content Include="Tokenizer.js" />
+    <Content Include="Tokenizer.js.map" />
+    <Content Include="tree.dot" />
+    <Content Include="tree3.dot" />
+    <Content Include="TreeNode.js" />
+    <Content Include="TreeNode.js.map" />
     <Content Include="Typescript1.txt" />
     <Content Include="tsconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Grammar.ts" />
+    <TypeScriptCompile Include="Node.ts" />
+    <TypeScriptCompile Include="Parser.ts" />
+    <TypeScriptCompile Include="testharness.ts" />
+    <TypeScriptCompile Include="Token.ts" />
+    <TypeScriptCompile Include="TreeNode.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>
