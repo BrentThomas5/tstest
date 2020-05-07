@@ -1,4 +1,4 @@
-﻿import { Token } from "./Token"
+import { Token } from "./Token"
 import { Grammar } from "./Grammar"
 
 export class Tokenizer {
@@ -44,8 +44,8 @@ export class Tokenizer {
         this.idx = tmpIdx;
         return tmpNext;
     }
-    previous(): Token {
-        if (this.previousList.length < 2) {
+    previous(): Token{
+        if(this.previousList.length < 2){
             return undefined;
         }
         return this.previousList[this.previousList.length - 2];
