@@ -19,6 +19,7 @@ export class Grammar {
             }
             var ID = terms[i].split(" -> ");
             if (s.has(ID[0])) {
+                //console.log(ID[0]);
                 throw new Error("Already has that variable");
             }
             else if (ID[0] == "")
@@ -72,8 +73,7 @@ export class Grammar {
         this.dfs(start, used);
         if (s !== undefined) {
             s.forEach(def => {
-                if (!used.has(def))
-                    throw new Error(def + " was defined but is not used");
+                if (!used.has(def)) {}
 
             });
         }
@@ -83,6 +83,7 @@ export class Grammar {
                     throw new Error(v + " is used but is not defined");
             })
         }
+        
     }
     dfs(node: NodeType, used: Set<string>) {
     used.add(node.label);
