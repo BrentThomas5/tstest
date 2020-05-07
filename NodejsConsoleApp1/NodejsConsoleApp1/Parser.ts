@@ -1,5 +1,6 @@
 import { TreeNode } from "./TreeNode";
 import { Token } from "./Token";
+import { makeAsm } from "./ASM";
 declare var require: any;
 let antlr4 = require('./antlr4')
 let Lexer = require('./gramLexer.js').gramLexer;
@@ -19,7 +20,7 @@ export function parse(txt: string) {
     //this assumes your start symbol is 'start'
     let antlrroot = parser.program();
     let root: TreeNode = walk(parser, antlrroot);
-    return root.toString();
+    return makeAsm(root);
 
     // ...
 }

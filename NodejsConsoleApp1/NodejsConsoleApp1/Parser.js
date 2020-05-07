@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const TreeNode_1 = require("./TreeNode");
 const Token_1 = require("./Token");
+const ASM_1 = require("./ASM");
 let antlr4 = require('./antlr4');
 let Lexer = require('./gramLexer.js').gramLexer;
 let Parser = require('./gramParser.js').gramParser;
@@ -19,7 +20,7 @@ function parse(txt) {
     //this assumes your start symbol is 'start'
     let antlrroot = parser.program();
     let root = walk(parser, antlrroot);
-    return root.toString();
+    return ASM_1.makeAsm(root);
     // ...
 }
 exports.parse = parse;
