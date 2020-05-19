@@ -1,18 +1,15 @@
-import { Token } from "./Token"
-import { Grammar } from "./Grammar"
-
-export class Tokenizer {
-    grammar: Grammar;
-    inputData: string;
-    currentLine: number = 1;
-    idx: number = 0;
-    cur: Token;
-    previousList: Token[] = [];
-    constructor(grammar: Grammar) {
+"use strict";
+exports.__esModule = true;
+var Token_1 = require("./Token");
+var Tokenizer = /** @class */ (function () {
+    function Tokenizer(grammar) {
+        this.currentLine = 1;
+        this.idx = 0;
+        this.previousList = [];
         this.grammar = grammar;
         var addWhite = true;
         var addComment = true;
-        for (let i = 0; i < this.grammar.terminals.length; ++i) {
+        for (var i = 0; i < this.grammar.terminals.length; ++i) {
             if (this.grammar.terminals[i][0] == "WHITESPACE")
                 addWhite = false;
             if (this.grammar.terminals[i][0] == "COMMENT")
@@ -23,52 +20,46 @@ export class Tokenizer {
         if (addComment)
             this.grammar.terminals.push(["COMMENT", new RegExp("/\\*(.|\\n)*?\\*/")]);
     }
-
-    setInput(inputData: string) {
+    Tokenizer.prototype.setInput = function (inputData) {
         this.inputData = inputData;
         this.currentLine = 1;
         this.idx = 0;
-    }
-
-    peek() {
-        let tmpCur: Token = this.cur;
-        let tmpLine: number = this.currentLine;
-        let tmpList: Token[] = this.previousList;
-        let tmpIdx = this.idx;
-        let tmpNext = this.next();
+    };
+    Tokenizer.prototype.peek = function () {
+        var tmpCur = this.cur;
+        var tmpLine = this.currentLine;
+        var tmpList = this.previousList;
+        var tmpIdx = this.idx;
+        var tmpNext = this.next();
         this.cur = tmpCur;
         this.currentLine = tmpLine;
         this.previousList = tmpList;
         this.idx = tmpIdx;
         return tmpNext;
-    }
-
-    previous(): Token{
-        if(this.previousList.length < 2){
+    };
+    Tokenizer.prototype.previous = function () {
+        if (this.previousList.length < 2) {
             return undefined;
         }
         return this.previousList[this.previousList.length - 2];
-    }
-
-    next(): Token {
+    };
+    Tokenizer.prototype.next = function () {
         if (this.idx >= this.inputData.length) {
-            return new Token("$", undefined, this.currentLine)
+            return new Token_1.Token("$", undefined, this.currentLine);
         }
-
-        for (let i = 0; i < this.grammar.terminals.length; ++i) {
-            let terminal = this.grammar.terminals[i];
-            let sym = terminal[0];
-            let rex = new RegExp(terminal[1], "y");
-            rex.lastIndex = this.idx; 
-            let m = rex.exec(this.inputData);
+        for (var i = 0; i < this.grammar.terminals.length; ++i) {
+            var terminal = this.grammar.terminals[i];
+            var sym = terminal[0];
+            var rex = new RegExp(terminal[1], "y");
+            rex.lastIndex = this.idx;
+            var m = rex.exec(this.inputData);
             if (m) {
-                let lexeme = m[0];
+                var lexeme = m[0];
                 this.idx += lexeme.length;
-                let tmp = this.currentLine;
+                var tmp = this.currentLine;
                 this.currentLine += lexeme.split('\n').length - 1;
-
                 if (sym !== "WHITESPACE" && sym !== "COMMENT") {
-                    this.cur = new Token(sym, lexeme, tmp);
+                    this.cur = new Token_1.Token(sym, lexeme, tmp);
                     this.previousList.push(this.cur);
                     if (this.previousList.length > 2) {
                         this.previousList.shift();
@@ -80,6 +71,8 @@ export class Tokenizer {
                 }
             }
         }
-        throw new Error("Syntax error")
-    }
-}
+        throw new Error("Syntax error");
+    };
+    return Tokenizer;
+}());
+exports.Tokenizer = Tokenizer;

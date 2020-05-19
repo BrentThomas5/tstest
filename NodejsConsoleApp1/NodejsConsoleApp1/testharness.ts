@@ -1,119 +1,89 @@
 
-declare var require: any;
-declare var process: any;
-
+declare var require:any;
 let fs = require("fs");
+import {Grammar} from "./Grammar";
 
-import { parse } from "./shuntingyard"
+function main(){
+    let data:string = fs.readFileSync("tests.txt","utf8");
+    let tests: any = JSON.parse(data);
+    let numPassed=0;
+    let numFailed=0;
+    
+    for(let i=0;i<tests.length;++i){
+        
+        let name: string = tests[i]["name"];
+        let expected: { [key:string] : string[]} = tests[i]["first"];
+        let input: string = tests[i]["input"];
 
-let testCount = 0;
-
-function main() {
-    let ok = testWithFile("basictests.txt");
-    if (ok)
-        process.stderr.write("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-Basic tests OK-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
-    else
-        return;
-
-    ok = testWithFile("bonus1tests.txt");
-    if (ok)
-        process.stderr.write("-=-=-=-=-=-=-=-=-=-=-Bonus 1 tests (1+ argument functions) OK-=-=-=-=-=-=-=-=-=-=-\n");
-    else
-        return;
-
-    ok = testWithFile("bonus2tests.txt");
-    if (ok)
-        process.stderr.write("-=-=-=-=-=-=-=-=-=-=-Bonus 2 tests (0+ argument functions) OK-=-=-=-=-=-=-=-=-=-=-\n");
-    else
-        return;
-    process.stderr.write(testCount + " tests OK\n");
+        let G = new Grammar(input);
+        
+        let first : Map<string,Set<string>> = G.getFirst();
+        if( !dictionariesAreSame( expected, first ) ){
+            console.log("Test "+name+" failed");
+            ++numFailed;
+        } 
+        else
+            ++numPassed;
+    }
+    console.log(numPassed+" tests OK"+"      "+numFailed+" tests failed" );
+    return numFailed==0;
 }
 
-function testWithFile(fname: string): boolean {
-    let data: string = fs.readFileSync(fname, "utf8");
-    let lst = data.split(/\n/g);
-    for (let i = 0; i < lst.length; ++i) {
-        let line = lst[i].trim();
-        if (line.length === 0)
-            continue;
-        let idx = line.indexOf("\t");
-        let inp = line.substring(0, idx);
-        let expectedStr = line.substring(idx);
-        console.log("Testing " + inp + " ...");
-        ++testCount;
-        let expected = JSON.parse(expectedStr);
-        let actual = parse(inp);
-
-        if (!treesAreSame(actual, expected)) {
-            console.log("BAD!");
-            console.log(inp);
-            dumpTree("actual.dot", actual);
-            dumpTree("expected.dot", expected);
+function dictionariesAreSame( s1: { [key:string] : string[]}, s2: Map<string,Set<string>> ){
+    let M1: Map<string,Set<string>> = toMap(s1);
+    let M2 = s2;
+    
+    let k1: string[] = [];
+    let k2: string[] = [];
+    for(let k of M1.keys() )
+        k1.push(k);
+    for(let k of M2.keys() )
+        k2.push(k);
+    k1.sort();
+    k2.sort();
+    if( !listsEqual(k1,k2) ){
+        console.log("Lists not equal:",k1,k2);
+        return false;
+    }
+    for(let k of k1){
+        if( !listsEqual( M1.get(k), M2.get(k) ) ){
+            console.log("Lists not equal:",M1.get(k), M2.get(k)  );
             return false;
-        } else {
         }
     }
     return true;
 }
 
-function treesAreSame(n1: any, n2: any) {
-    if (n1 === undefined && n2 !== undefined)
+function toMap( s: { [key:string] : string[]} ) {
+    let r : Map<string,Set<string>> = new Map();
+    for(let k in s ){
+        r.set(k,new Set());
+        s[k].forEach( (x:string) => {
+            r.get(k).add(x);
+        });
+    }
+    return r;
+}
+    
+function listsEqual(L1a: any, L2a: any )
+{
+    let L1: string[] = [];
+    let L2: string[] = [];
+    L1a.forEach( (x:string) => {
+        L1.push(x);
+    });
+    L2a.forEach( (x:string) => {
+        L2.push(x);
+    });
+    
+    L1.sort();
+    L2.sort();
+    if( L1.length !== L2.length )
         return false;
-    if (n2 === undefined && n1 !== undefined)
-        return false;
-    if (n1["sym"] != n2["sym"])
-        return false;
-    if (n1["children"].length != n2["children"].length)
-        return false;
-    for (let i = 0; i < n1["children"].length; ++i) {
-        if (!treesAreSame(n1["children"][i], n2["children"][i]))
+    for(let i=0;i<L1.length;++i){
+        if( L1[i] !== L2[i] )
             return false;
     }
     return true;
 }
-
-function dumpTree(fname: string, root: any) {
-    function walk(n: any, callback: any) {
-        if (!n)
-            return;
-        callback(n);
-        if (!n.children)
-            return;
-        n.children.forEach((x: any) => {
-            if (!x)
-                return;
-            walk(x, callback);
-        });
-    }
-    let L: string[] = [];
-    L.push("digraph d{");
-    L.push(`node [fontname="Helvetica",shape=box];`);
-    let counter = 0;
-    walk(root, (n: any) => {
-        if (!n)
-            return;
-        n.NUMBER = "n" + (counter++);
-        let tmp = n.sym;
-        tmp = tmp.replace(/&/g, "&amp;");
-        tmp = tmp.replace(/</g, "&lt;");
-        tmp = tmp.replace(/>/g, "&gt;");
-        tmp = tmp.replace(/\n/g, "<br/>");
-
-        L.push(`${n.NUMBER} [label=<${tmp}>];`);
-    });
-    walk(root, (n: any) => {
-        if (!n || !n.children)
-            return;
-        n.children.forEach((x: any) => {
-            if (!x)
-                return;
-            L.push(`${n.NUMBER} -> ${x.NUMBER};`);
-        });
-    });
-    L.push("}");
-    fs.writeFileSync(fname, L.join("\n"));
-}
-
-
-
 main();

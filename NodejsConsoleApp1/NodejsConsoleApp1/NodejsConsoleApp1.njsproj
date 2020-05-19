@@ -11,8 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>16d84179-8894-482d-ab63-1402b7994c48</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>testharness.ts</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -30,14 +29,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="actual.dot" />
-    <Content Include="basictests.txt" />
-    <Content Include="bonus1tests.txt" />
-    <Content Include="bonus2tests.txt" />
-    <Content Include="expected.dot" />
     <Content Include="inputs.json" />
     <Content Include="package.json" />
-    <Content Include="README.md" />
     <Content Include="tests.txt" />
     <Content Include="tsconfig.json" />
   </ItemGroup>

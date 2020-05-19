@@ -4,6 +4,7 @@ export class Grammar {
     terminals: [string, RegExp][] = [];
     nonTerminals: [string, string][] = [];
     nullable: Set<string> = new Set();
+    first: Map<string, Set<string>>;
     constructor(Gram: string) {
         let s: Set<string> = new Set();
         var input = Gram.split("\n");
@@ -28,18 +29,17 @@ export class Grammar {
                 continue;
             }
             else if (!terms[i].includes(" -> ")) {
-                throw new Error("No Identifiers");
+                throw new Error("Need Identifiers");
             }
             var ID = terms[i].split(" -> ");
             if (s.has(ID[0])) {
-                //console.log(ID[0]);
-                throw new Error("Already has that variable");
+                throw new Error("Variable already exists");
             }
             else if (ID[0] == "")
-                throw new Error("Empty ID");
+                throw new Error("No ID");
             if (s.has(ID[1])) {
                 
-                throw new Error("Regex already created");  
+                throw new Error("Regex has already been created");  
             }
                 
             else if (ID[1] == "")
@@ -48,7 +48,7 @@ export class Grammar {
                 new RegExp(ID[1])
             }
             catch {
-                throw new Error("Invalid regular expression")
+                throw new Error("Tried to create an invalid regular expression")
             }
             if (!s.has(ID[0]))
                 s.add(ID[0]);
@@ -65,21 +65,17 @@ export class Grammar {
             var ID = nonTerms[i].split(" -> ");
            
             if (ID[0] == "")
-                throw new Error("Empty ID");
+                throw new Error("No ID");
             else if (ID[1]=="")
                 throw new Error("Empty nonterminal");
-
-            //console.log(this.nonTerminals);
             const found: number = this.nonTerminals.findIndex(e => e[0] === ID[0])
             if (found !== -1) {
                 var nonterm = this.nonTerminals[found];
                 this.nonTerminals[found][1] = nonterm + ' | ' + ID[1];
 
             }
-
             else if (!s.has(ID[0]))
                 s.add(ID[0]);
-            //console.log(s);
             this.nonTerminals[i] = [ID[0], ID[1]];
         }
         
@@ -89,48 +85,69 @@ export class Grammar {
         if (s !== undefined) {
             s.forEach(def => {
                 if (!used.has(def)) {}
-                    //throw new Error(def + " was defined but is not used");
-
             });
         }
         if (used != undefined) {
             used.forEach(v => {
                 if (v !== '' && !s.has(v)) {}
-                    //throw new Error(v + " is used but is not defined");
             })
         }
-        
-        //let bar: Set<string> = new Set();
     }
     
     getNullable() {
         this.nullable = new Set();
         let bool;
-        //console.log(this.nonTerminals);
         while (true) {
             bool = true;
-            this.nonTerminals.forEach(e => {
-                console.log(e);
-                if (!this.nullable.has(e[0])) {
-                    let productions = e[1].split("|");
-                    //console.log(productions);
-                    productions.forEach(p => {
-                        let pro = p.trim().split(" ");
+            this.nonTerminals.forEach(N => {
+                if (!this.nullable.has(N[0])) {
+                    let productions = N[1].split("|");
+                    productions.forEach(P => {
+                        let pro = P.trim().split(" ");
 
-                        if (pro.every(s => this.nullable.has(s) || s == "lambda")) {
-                            this.nullable.add(e[0]);
+                        if (pro.every(x => this.nullable.has(x) || x == "lambda")) {
+                            this.nullable.add(N[0]);
                             bool = false;
                         }
-
                     })
                 }
             });
             if (bool)
                 break;
         }
-        //console.log(this.nullable);
         return this.nullable;
     }
+
+    getFirst() {
+        this.first = new Map();
+        let bool;
+        this.terminals.forEach(t => {
+            let tmpset: Set<string> = new Set();
+            tmpset.add(t[0]);
+            this.first.set(t[0], tmpset);
+        })
+        while (true) {
+            bool = true;
+            this.nonTerminals.forEach(N => {
+                let firstSet: Set<string> = new Set();
+                firstSet.add(N[0]);
+                let productions = N[1].split("|");
+                productions.forEach(P => {
+                    let pro = P.trim().split(" ");
+                    pro.forEach(x => {
+                        firstSet.add(x);
+                        this.first.set(N[0], firstSet);
+                        if (!this.nullable.has(x))
+                            bool = false;
+                    })
+                })
+            });
+            if (bool)
+                break;
+        }
+        return this.first;
+    }
+
     dfs(node: NodeType, used: Set<string>) {
     used.add(node.label);
     const found = this.nonTerminals.find(nt => nt[0] === node.label);
@@ -156,7 +173,3 @@ export class Grammar {
 }
 
 }
-
-
-
-
