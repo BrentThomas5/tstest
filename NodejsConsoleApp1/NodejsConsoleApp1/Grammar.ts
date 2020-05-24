@@ -1,5 +1,4 @@
-import { NodeType } from "./Node"
-import { error } from "util";
+//import { error } from "util";
 export class Grammar {
     terminals: [string, RegExp][] = [];
     nonTerminals: [string, string][] = [];
@@ -78,20 +77,6 @@ export class Grammar {
                 s.add(ID[0]);
             this.nonTerminals[i] = [ID[0], ID[1]];
         }
-        
-        let used: Set<string> = new Set();
-        let start: NodeType = new NodeType("expr");
-        this.dfs(start, used);
-        if (s !== undefined) {
-            s.forEach(def => {
-                if (!used.has(def)) {}
-            });
-        }
-        if (used != undefined) {
-            used.forEach(v => {
-                if (v !== '' && !s.has(v)) {}
-            })
-        }
     }
     
     getNullable() {
@@ -121,55 +106,57 @@ export class Grammar {
     getFirst() {
         this.first = new Map();
         let bool;
-        this.terminals.forEach(t => {
-            let tmpset: Set<string> = new Set();
-            tmpset.add(t[0]);
-            this.first.set(t[0], tmpset);
+        this.nonTerminals.forEach(t => {
+            this.first.set(t[0], new Set);
+            //console.log("nonterminal:",t[0]);
         })
+        this.terminals.forEach(t => {
+            this.first.set(t[0], new Set);
+            this.first.get(t[0]).add(t[0]);
+            //console.log("terminal:",t[0]);
+        })
+        
+        this.nullable = this.getNullable();
+        this.nullable.forEach(n => {
+            //console.log(n);
+        })
+
         while (true) {
             bool = true;
             this.nonTerminals.forEach(N => {
-                let firstSet: Set<string> = new Set();
-                firstSet.add(N[0]);
+                let bool2 = true;
+                let i = 0;
+                //console.log(N[0]);
+                //this.first.get(N[0]).add(N[0]);
                 let productions = N[1].split("|");
+                console.log(N[0] + ": " + N[1]);
                 productions.forEach(P => {
                     let pro = P.trim().split(" ");
-                    pro.forEach(x => {
-                        firstSet.add(x);
-                        this.first.set(N[0], firstSet);
-                        if (!this.nullable.has(x))
-                            bool = false;
-                    })
+                    if( pro[0] == "lambda"){
+                        pro[0] = "";
+
+                    }
+                    else{
+                        for(let x of pro){
+                            this.first.get(x).forEach(item => {
+                                if(!this.first.get(N[0]).has(item)){
+                                    this.first.get(N[0]).add(item);
+                                    bool = false;
+                                }
+                            })
+                            if(!this.nullable.has(x)){
+                                break;
+                            }
+                        }
+                    }
                 })
             });
             if (bool)
                 break;
         }
+        for(let entry of this.first.entries()){
+            console.log("Key:",entry[0],"|||| Value:",entry[1]);
+        }
         return this.first;
     }
-
-    dfs(node: NodeType, used: Set<string>) {
-    used.add(node.label);
-    const found = this.nonTerminals.find(nt => nt[0] === node.label);
-    if (found !== undefined) {
-        let str = found[1];
-        str = str.replace('|', '');
-        str = str.replace(',', ' ');
-        str.split(new RegExp('\\b')).forEach(t => {
-            let tmp = t.trim();
-            if (tmp !== '') {
-                let newNode: NodeType = new NodeType(tmp);
-                node.n.push(newNode);
-            }
-        });
-    }
-    if (node.n !== undefined) {
-        node.n.forEach((t: NodeType) => {
-            if (!used.has(t.label)) {
-                this.dfs(t, used);
-            }
-        });
-    }
-}
-
 }

@@ -1,6 +1,18 @@
 "use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 exports.__esModule = true;
-var Node_1 = require("./Node");
+exports.Grammar = void 0;
+//import { error } from "util";
 var Grammar = /** @class */ (function () {
     function Grammar(Gram) {
         this.terminals = [];
@@ -73,19 +85,6 @@ var Grammar = /** @class */ (function () {
                 s.add(ID[0]);
             this.nonTerminals[i] = [ID[0], ID[1]];
         }
-        var used = new Set();
-        var start = new Node_1.NodeType("expr");
-        this.dfs(start, used);
-        if (s !== undefined) {
-            s.forEach(function (def) {
-                if (!used.has(def)) { }
-            });
-        }
-        if (used != undefined) {
-            used.forEach(function (v) {
-                if (v !== '' && !s.has(v)) { }
-            });
-        }
     }
     Grammar.prototype.getNullable = function () {
         var _this = this;
@@ -111,58 +110,80 @@ var Grammar = /** @class */ (function () {
         return this.nullable;
     };
     Grammar.prototype.getFirst = function () {
+        var e_1, _a;
         var _this = this;
         this.first = new Map();
         var bool;
+        this.nonTerminals.forEach(function (t) {
+            _this.first.set(t[0], new Set);
+            //console.log("nonterminal:",t[0]);
+        });
         this.terminals.forEach(function (t) {
-            var tmpset = new Set();
-            tmpset.add(t[0]);
-            _this.first.set(t[0], tmpset);
+            _this.first.set(t[0], new Set);
+            _this.first.get(t[0]).add(t[0]);
+            //console.log("terminal:",t[0]);
+        });
+        this.nullable = this.getNullable();
+        this.nullable.forEach(function (n) {
+            //console.log(n);
         });
         while (true) {
             bool = true;
             this.nonTerminals.forEach(function (N) {
-                var firstSet = new Set();
-                firstSet.add(N[0]);
+                var bool2 = true;
+                var i = 0;
+                //console.log(N[0]);
+                //this.first.get(N[0]).add(N[0]);
                 var productions = N[1].split("|");
+                console.log(N[0] + ": " + N[1]);
                 productions.forEach(function (P) {
+                    var e_2, _a;
                     var pro = P.trim().split(" ");
-                    pro.forEach(function (x) {
-                        firstSet.add(x);
-                        _this.first.set(N[0], firstSet);
-                        if (!_this.nullable.has(x))
-                            bool = false;
-                    });
+                    if (pro[0] == "lambda") {
+                        pro[0] = "";
+                    }
+                    else {
+                        try {
+                            for (var pro_1 = (e_2 = void 0, __values(pro)), pro_1_1 = pro_1.next(); !pro_1_1.done; pro_1_1 = pro_1.next()) {
+                                var x = pro_1_1.value;
+                                _this.first.get(x).forEach(function (item) {
+                                    if (!_this.first.get(N[0]).has(item)) {
+                                        _this.first.get(N[0]).add(item);
+                                        bool = false;
+                                    }
+                                });
+                                if (!_this.nullable.has(x)) {
+                                    break;
+                                }
+                            }
+                        }
+                        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                        finally {
+                            try {
+                                if (pro_1_1 && !pro_1_1.done && (_a = pro_1["return"])) _a.call(pro_1);
+                            }
+                            finally { if (e_2) throw e_2.error; }
+                        }
+                    }
                 });
             });
             if (bool)
                 break;
         }
+        try {
+            for (var _b = __values(this.first.entries()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var entry = _c.value;
+                console.log("Key:", entry[0], "|||| Value:", entry[1]);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b["return"])) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
         return this.first;
-    };
-    Grammar.prototype.dfs = function (node, used) {
-        var _this = this;
-        used.add(node.label);
-        var found = this.nonTerminals.find(function (nt) { return nt[0] === node.label; });
-        if (found !== undefined) {
-            var str = found[1];
-            str = str.replace('|', '');
-            str = str.replace(',', ' ');
-            str.split(new RegExp('\\b')).forEach(function (t) {
-                var tmp = t.trim();
-                if (tmp !== '') {
-                    var newNode = new Node_1.NodeType(tmp);
-                    node.n.push(newNode);
-                }
-            });
-        }
-        if (node.n !== undefined) {
-            node.n.forEach(function (t) {
-                if (!used.has(t.label)) {
-                    _this.dfs(t, used);
-                }
-            });
-        }
     };
     return Grammar;
 }());

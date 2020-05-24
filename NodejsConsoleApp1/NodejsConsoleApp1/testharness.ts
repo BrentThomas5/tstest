@@ -10,14 +10,13 @@ function main(){
     let numFailed=0;
     
     for(let i=0;i<tests.length;++i){
-        
         let name: string = tests[i]["name"];
         let expected: { [key:string] : string[]} = tests[i]["first"];
         let input: string = tests[i]["input"];
 
         let G = new Grammar(input);
-        
         let first : Map<string,Set<string>> = G.getFirst();
+		//console.log("Made it past getFirst");
         if( !dictionariesAreSame( expected, first ) ){
             console.log("Test "+name+" failed");
             ++numFailed;
@@ -42,12 +41,12 @@ function dictionariesAreSame( s1: { [key:string] : string[]}, s2: Map<string,Set
     k1.sort();
     k2.sort();
     if( !listsEqual(k1,k2) ){
-        console.log("Lists not equal:",k1,k2);
+        console.log("Lists not equal1:",k1,k2);
         return false;
     }
     for(let k of k1){
         if( !listsEqual( M1.get(k), M2.get(k) ) ){
-            console.log("Lists not equal:",M1.get(k), M2.get(k)  );
+            console.log("Lists not equal2:",M1.get(k), M2.get(k)  );
             return false;
         }
     }

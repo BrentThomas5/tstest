@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.Tokenizer = void 0;
 var Token_1 = require("./Token");
 var Tokenizer = /** @class */ (function () {
     function Tokenizer(grammar) {

@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.parse = void 0;
 var TreeNode_1 = require("./TreeNode");
 var Tokenizer_1 = require("./Tokenizer");
 var Grammar_1 = require("./Grammar");

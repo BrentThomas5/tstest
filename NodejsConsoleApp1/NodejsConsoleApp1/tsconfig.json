@@ -1,10 +1,10 @@
 {
-  "compilerOptions": {
+  "compilerOptions" : {
     "noEmitOnError": true,
-    "lib": [ "es2017", "dom" ],
+    "lib" : ["es2017", "dom"],
     "noImplicitAny": true,
     "moduleResolution": "Classic",
-    "downlevelIteration":  true
+    "downlevelIteration": true
   },
   "include": [ "*.ts" ]
 }

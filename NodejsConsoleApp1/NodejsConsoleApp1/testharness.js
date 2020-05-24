@@ -24,6 +24,7 @@ function main() {
         var input = tests[i]["input"];
         var G = new Grammar_1.Grammar(input);
         var first = G.getFirst();
+        //console.log("Made it past getFirst");
         if (!dictionariesAreSame(expected, first)) {
             console.log("Test " + name_1 + " failed");
             ++numFailed;
@@ -69,14 +70,14 @@ function dictionariesAreSame(s1, s2) {
     k1.sort();
     k2.sort();
     if (!listsEqual(k1, k2)) {
-        console.log("Lists not equal:", k1, k2);
+        console.log("Lists not equal1:", k1, k2);
         return false;
     }
     try {
         for (var k1_1 = __values(k1), k1_1_1 = k1_1.next(); !k1_1_1.done; k1_1_1 = k1_1.next()) {
             var k = k1_1_1.value;
             if (!listsEqual(M1.get(k), M2.get(k))) {
-                console.log("Lists not equal:", M1.get(k), M2.get(k));
+                console.log("Lists not equal2:", M1.get(k), M2.get(k));
                 return false;
             }
         }
