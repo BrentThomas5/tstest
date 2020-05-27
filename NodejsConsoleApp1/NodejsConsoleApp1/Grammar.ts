@@ -129,7 +129,7 @@ export class Grammar {
                 //console.log(N[0]);
                 //this.first.get(N[0]).add(N[0]);
                 let productions = N[1].split("|");
-                console.log(N[0] + ": " + N[1]);
+                //console.log(N[0] + ": " + N[1]);
                 productions.forEach(P => {
                     let pro = P.trim().split(" ");
                     if( pro[0] == "lambda"){
@@ -155,7 +155,7 @@ export class Grammar {
                 break;
         }
         for(let entry of this.first.entries()){
-            console.log("Key:",entry[0],"|||| Value:",entry[1]);
+            //console.log("Key:",entry[0],"|||| Value:",entry[1]);
         }
         return this.first;
     }
