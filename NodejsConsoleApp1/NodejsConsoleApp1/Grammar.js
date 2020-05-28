@@ -110,41 +110,30 @@ var Grammar = /** @class */ (function () {
         return this.nullable;
     };
     Grammar.prototype.getFirst = function () {
-        var e_1, _a;
         var _this = this;
         this.first = new Map();
         var bool;
         this.nonTerminals.forEach(function (t) {
             _this.first.set(t[0], new Set);
-            //console.log("nonterminal:",t[0]);
         });
         this.terminals.forEach(function (t) {
             _this.first.set(t[0], new Set);
             _this.first.get(t[0]).add(t[0]);
-            //console.log("terminal:",t[0]);
         });
         this.nullable = this.getNullable();
-        this.nullable.forEach(function (n) {
-            //console.log(n);
-        });
         while (true) {
             bool = true;
             this.nonTerminals.forEach(function (N) {
-                var bool2 = true;
-                var i = 0;
-                //console.log(N[0]);
-                //this.first.get(N[0]).add(N[0]);
                 var productions = N[1].split("|");
-                console.log(N[0] + ": " + N[1]);
                 productions.forEach(function (P) {
-                    var e_2, _a;
+                    var e_1, _a;
                     var pro = P.trim().split(" ");
                     if (pro[0] == "lambda") {
                         pro[0] = "";
                     }
                     else {
                         try {
-                            for (var pro_1 = (e_2 = void 0, __values(pro)), pro_1_1 = pro_1.next(); !pro_1_1.done; pro_1_1 = pro_1.next()) {
+                            for (var pro_1 = (e_1 = void 0, __values(pro)), pro_1_1 = pro_1.next(); !pro_1_1.done; pro_1_1 = pro_1.next()) {
                                 var x = pro_1_1.value;
                                 _this.first.get(x).forEach(function (item) {
                                     if (!_this.first.get(N[0]).has(item)) {
@@ -157,12 +146,12 @@ var Grammar = /** @class */ (function () {
                                 }
                             }
                         }
-                        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                        catch (e_1_1) { e_1 = { error: e_1_1 }; }
                         finally {
                             try {
                                 if (pro_1_1 && !pro_1_1.done && (_a = pro_1["return"])) _a.call(pro_1);
                             }
-                            finally { if (e_2) throw e_2.error; }
+                            finally { if (e_1) throw e_1.error; }
                         }
                     }
                 });
@@ -170,20 +159,29 @@ var Grammar = /** @class */ (function () {
             if (bool)
                 break;
         }
-        try {
-            for (var _b = __values(this.first.entries()), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var entry = _c.value;
-                console.log("Key:", entry[0], "|||| Value:", entry[1]);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b["return"])) _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
         return this.first;
+    };
+    Grammar.prototype.getFollow = function () {
+        var follow;
+        var bool;
+        var firsts = this.getFirst();
+        var nullables = this.getNullable();
+        /*while(true){
+            bool = true;
+            this.nonTerminals.forEach(N => {
+                let productions = N[1].split("|");
+                productions.forEach(P => {
+                    let pro = P.trim().split(" ");
+                    if(pro[0] == "lambda"){
+                        pro[0] = "";
+                    }
+                    else{
+                        
+                    }
+                })
+            })
+        }*/
+        return follow;
     };
     return Grammar;
 }());

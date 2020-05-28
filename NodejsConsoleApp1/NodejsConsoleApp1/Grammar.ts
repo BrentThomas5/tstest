@@ -1,9 +1,12 @@
+import { stringify } from "querystring";
+
 //import { error } from "util";
 export class Grammar {
     terminals: [string, RegExp][] = [];
     nonTerminals: [string, string][] = [];
     nullable: Set<string> = new Set();
     first: Map<string, Set<string>>;
+    follow: Map<string, Set<string>>;
     constructor(Gram: string) {
         let s: Set<string> = new Set();
         var input = Gram.split("\n");
@@ -108,33 +111,21 @@ export class Grammar {
         let bool;
         this.nonTerminals.forEach(t => {
             this.first.set(t[0], new Set);
-            //console.log("nonterminal:",t[0]);
         })
         this.terminals.forEach(t => {
             this.first.set(t[0], new Set);
             this.first.get(t[0]).add(t[0]);
-            //console.log("terminal:",t[0]);
         })
-        
         this.nullable = this.getNullable();
-        this.nullable.forEach(n => {
-            //console.log(n);
-        })
-
+        
         while (true) {
             bool = true;
             this.nonTerminals.forEach(N => {
-                let bool2 = true;
-                let i = 0;
-                //console.log(N[0]);
-                //this.first.get(N[0]).add(N[0]);
                 let productions = N[1].split("|");
-                //console.log(N[0] + ": " + N[1]);
                 productions.forEach(P => {
                     let pro = P.trim().split(" ");
                     if( pro[0] == "lambda"){
                         pro[0] = "";
-
                     }
                     else{
                         for(let x of pro){
@@ -150,13 +141,39 @@ export class Grammar {
                         }
                     }
                 })
-            });
+            })
             if (bool)
                 break;
         }
-        for(let entry of this.first.entries()){
-            //console.log("Key:",entry[0],"|||| Value:",entry[1]);
-        }
         return this.first;
+    }
+
+    getFollow() {
+        this.follow = new Map();
+        let bool;
+        let firsts = this.getFirst();
+        let nullables = this.getNullable();
+
+        while(true){
+            bool = true;
+            this.nonTerminals.forEach(N => {
+                let productions = N[1].split("|");
+                productions.forEach(P => {
+                    let pro = P.trim().split(" ");
+                    if(pro[0] == "lambda"){
+                        pro[0] = "";
+                    }
+                    else{
+                        for(var i = 0; i < pro.length; i++){
+                            let x = pro[i];
+                            if(this.nonTerminals.){
+
+                            }
+                        }
+                    }
+                })
+            })
+        }
+        return this.follow;
     }
 }
