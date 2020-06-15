@@ -19,6 +19,7 @@ function main() {
     var numPassed = 0;
     var numFailed = 0;
     for (var i = 0; i < tests.length; ++i) {
+        //tests.length
         var name_1 = tests[i]["name"];
         var expected = tests[i]["follow"];
         var input = tests[i]["input"];

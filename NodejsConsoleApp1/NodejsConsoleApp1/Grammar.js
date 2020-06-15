@@ -111,14 +111,14 @@ var Grammar = /** @class */ (function () {
     };
     Grammar.prototype.getFirst = function () {
         var _this = this;
-        this.first = new Map();
+        this.firsts = new Map();
         var bool;
         this.nonTerminals.forEach(function (t) {
-            _this.first.set(t[0], new Set);
+            _this.firsts.set(t[0], new Set);
         });
         this.terminals.forEach(function (t) {
-            _this.first.set(t[0], new Set);
-            _this.first.get(t[0]).add(t[0]);
+            _this.firsts.set(t[0], new Set);
+            _this.firsts.get(t[0]).add(t[0]);
         });
         this.nullable = this.getNullable();
         while (true) {
@@ -135,9 +135,9 @@ var Grammar = /** @class */ (function () {
                         try {
                             for (var pro_1 = (e_1 = void 0, __values(pro)), pro_1_1 = pro_1.next(); !pro_1_1.done; pro_1_1 = pro_1.next()) {
                                 var x = pro_1_1.value;
-                                _this.first.get(x).forEach(function (item) {
-                                    if (!_this.first.get(N[0]).has(item)) {
-                                        _this.first.get(N[0]).add(item);
+                                _this.firsts.get(x).forEach(function (item) {
+                                    if (!_this.firsts.get(N[0]).has(item)) {
+                                        _this.firsts.get(N[0]).add(item);
                                         bool = false;
                                     }
                                 });
@@ -159,29 +159,63 @@ var Grammar = /** @class */ (function () {
             if (bool)
                 break;
         }
-        return this.first;
+        return this.firsts;
     };
     Grammar.prototype.getFollow = function () {
-        var follow;
+        var _this = this;
+        this.follows = new Map();
         var bool;
-        var firsts = this.getFirst();
+        var firsties = this.getFirst();
         var nullables = this.getNullable();
-        /*while(true){
+        var brokeOut = false;
+        var nonterms = new Array();
+        this.nonTerminals.forEach(function (t) {
+            _this.follows.set(t[0], new Set);
+            nonterms.push(t[0]);
+        });
+        this.follows.values().next().value.add("$");
+        while (true) {
             bool = true;
-            this.nonTerminals.forEach(N => {
-                let productions = N[1].split("|");
-                productions.forEach(P => {
-                    let pro = P.trim().split(" ");
-                    if(pro[0] == "lambda"){
-                        pro[0] = "";
+            this.nonTerminals.forEach(function (N) {
+                var productions = N[1].split("|");
+                productions.forEach(function (P) {
+                    var pro = P.trim().split(" ");
+                    var _loop_1 = function (i) {
+                        var x = pro[i];
+                        if (nonterms.includes(x)) {
+                            brokeOut = false;
+                            for (var k = i + 1; k < pro.length; k++) {
+                                var y = pro[k];
+                                firsties.get(y).forEach(function (item) {
+                                    if (!_this.follows.get(x).has(item)) {
+                                        _this.follows.get(x).add(item);
+                                        bool = false;
+                                    }
+                                });
+                                if (!nullables.has(y)) {
+                                    brokeOut = true;
+                                    break;
+                                }
+                            }
+                            if (!brokeOut) {
+                                _this.follows.get(N[0]).forEach(function (item) {
+                                    if (!_this.follows.get(x).has(item)) {
+                                        _this.follows.get(x).add(item);
+                                        bool = false;
+                                    }
+                                });
+                            }
+                        }
+                    };
+                    for (var i = 0; i < pro.length; i++) {
+                        _loop_1(i);
                     }
-                    else{
-                        
-                    }
-                })
-            })
-        }*/
-        return follow;
+                });
+            });
+            if (bool)
+                break;
+        }
+        return this.follows;
     };
     return Grammar;
 }());

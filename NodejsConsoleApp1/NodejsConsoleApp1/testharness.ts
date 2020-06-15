@@ -10,7 +10,6 @@ function main(){
     let numFailed=0;
     
     for(let i=0;i<tests.length;++i){
-        
         let name: string = tests[i]["name"];
         let expected: { [key:string] : string[]} = tests[i]["follow"];
         let input: string = tests[i]["input"];

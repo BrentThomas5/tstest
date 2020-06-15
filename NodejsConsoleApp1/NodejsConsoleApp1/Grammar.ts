@@ -1,12 +1,13 @@
 import { stringify } from "querystring";
+import { Console } from "console";
 
 //import { error } from "util";
 export class Grammar {
     terminals: [string, RegExp][] = [];
     nonTerminals: [string, string][] = [];
     nullable: Set<string> = new Set();
-    first: Map<string, Set<string>>;
-    follow: Map<string, Set<string>>;
+    firsts: Map<string, Set<string>>;
+    follows: Map<string, Set<string>>;
     constructor(Gram: string) {
         let s: Set<string> = new Set();
         var input = Gram.split("\n");
@@ -107,14 +108,14 @@ export class Grammar {
     }
 
     getFirst() {
-        this.first = new Map();
+        this.firsts = new Map();
         let bool;
         this.nonTerminals.forEach(t => {
-            this.first.set(t[0], new Set);
+            this.firsts.set(t[0], new Set);
         })
         this.terminals.forEach(t => {
-            this.first.set(t[0], new Set);
-            this.first.get(t[0]).add(t[0]);
+            this.firsts.set(t[0], new Set);
+            this.firsts.get(t[0]).add(t[0]);
         })
         this.nullable = this.getNullable();
         
@@ -129,9 +130,9 @@ export class Grammar {
                     }
                     else{
                         for(let x of pro){
-                            this.first.get(x).forEach(item => {
-                                if(!this.first.get(N[0]).has(item)){
-                                    this.first.get(N[0]).add(item);
+                            this.firsts.get(x).forEach(item => {
+                                if(!this.firsts.get(N[0]).has(item)){
+                                    this.firsts.get(N[0]).add(item);
                                     bool = false;
                                 }
                             })
@@ -145,35 +146,63 @@ export class Grammar {
             if (bool)
                 break;
         }
-        return this.first;
+        return this.firsts;
     }
 
     getFollow() {
-        this.follow = new Map();
+        this.follows = new Map();
         let bool;
-        let firsts = this.getFirst();
+        let firsties = this.getFirst();
         let nullables = this.getNullable();
+        let brokeOut = false;
+        let nonterms = new Array();
 
-        while(true){
+        this.nonTerminals.forEach(t => {
+            this.follows.set(t[0], new Set);
+            nonterms.push(t[0]);
+        })
+        
+        this.follows.values().next().value.add("$");
+
+        while(true)
+        {
             bool = true;
             this.nonTerminals.forEach(N => {
                 let productions = N[1].split("|");
                 productions.forEach(P => {
                     let pro = P.trim().split(" ");
-                    if(pro[0] == "lambda"){
-                        pro[0] = "";
-                    }
-                    else{
-                        for(var i = 0; i < pro.length; i++){
-                            let x = pro[i];
-                            if(this.nonTerminals.){
-
+                    for (let i = 0; i < pro.length; i++){
+                        let x = pro[i];
+                        if(nonterms.includes(x)){
+                            brokeOut = false;
+                            for(let k = i+1; k < pro.length; k++){
+                                let y = pro[k];
+                                firsties.get(y).forEach(item => {
+                                    if(!this.follows.get(x).has(item)){
+                                        this.follows.get(x).add(item);
+                                        bool = false;
+                                    }
+                                })
+                                if(!nullables.has(y)){
+                                    brokeOut = true;
+                                    break;
+                                }
+                            }
+                            if(!brokeOut){
+                                this.follows.get(N[0]).forEach(item => {
+                                    if(!this.follows.get(x).has(item)){
+                                        this.follows.get(x).add(item);
+                                        bool = false;
+                                    }
+                                })
                             }
                         }
                     }
                 })
             })
+            if (bool)
+                break;
         }
-        return this.follow;
+        return this.follows;
     }
 }
